@@ -16,7 +16,6 @@ use App\Http\Controllers\Houses;
 | contains the "web" middleware group. Now create something great!
 |
 */
-$GLOBALS['user'] = new Users();
 
 Route::post( '/', [ Houses::class, 'index' ]);
 Route::post( 'results', [ Houses::class, 'index' ]);
@@ -24,8 +23,22 @@ Route::post( 'new-home', [ Houses::class, 'newGame' ]);
 Route::post( 'check-result', [ Houses::class, 'checkResult' ]);
 Route::post( 'reroll', [ Houses::class, 'reroll' ]);
 Route::post( 'clicked-tab', [ Houses::class, 'clicked' ]);
+Route::post( 'get-cities', [ Houses::class, 'citiesOptions' ]);
+Route::post( '/end-screen', [ Houses::class, 'finalScore' ]);
+Route::post( '/change-name', [ Houses::class, 'changeName' ]);
 
-$pages = ['/', 'cuddleBunny', 'results', 'placethatprice', 'calculator', ];
+$pages = [
+	'/',
+	'cuddleBunny',
+	'results',
+	'placethatprice',
+	'calculator',
+	'about-us',
+	'privacy',
+	'terms',
+	'contact-us',
+	'placethatprice/leaderboard',
+];
 if(
 	request()->isMethod('get')
 	and !in_array( strtolower( request()->path() ), $pages )
@@ -37,7 +50,64 @@ if(
 Route::get('/', [ Houses::class, 'index' ]);
 Route::get('results', [ Houses::class, 'result' ]);
 Route::get('placethatprice', function () {
-    return view('homePrice');
+    return view(
+		'randomHouse',
+		[
+			'head' => 'templates.heads.price',
+			'body' => 'apps.placethatprice.startScreen',
+			'startIcon' => 'game',
+		]
+	);
+});
+
+Route::get('placethatprice/leaderboard', [ Houses::class, 'priceLeaderboard' ]);
+
+Route::get('privacy', function () {
+    return view(
+		'randomHouse',
+		[
+			'head' => 'templates.heads.home',
+			'body' => 'resources.privacyPolicy',
+			'startIcon' => 'info',
+		]
+	);
+});
+
+Route::get('terms', function () {
+    return view(
+		'randomHouse',
+		[
+			'head' => 'templates.heads.home',
+			'body' => 'resources.terms',
+			'startIcon' => 'info',
+		]
+	);
+});
+
+Route::get('contact-us', function () {
+    return view(
+		'randomHouse',
+		[
+			'head' => 'templates.heads.home',
+			'body' => 'resources.contact',
+			'startIcon' => 'info',
+		]
+	);
+});
+
+Route::get('about-us', function () {
+    return view(
+		'randomHouse',
+		[
+			'head' => 'templates.heads.home',
+			'body' => 'resources.about',
+			'startIcon' => 'info',
+		]
+	);
+});
+
+Route::get('calculator', function () {
+    return view('apps.calculator.main');
 });
 
 Route::get('cuddleBunny', function () {

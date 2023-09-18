@@ -1,4 +1,4 @@
-<div class="info-box">
+<div class="info-box stretch">
 	<div class="filter-wrapper">
 		<h2 class="title">Round {{$round}}</h2>
 		<hr />
@@ -15,15 +15,16 @@
 				?>
 				<img id="preview-img" src="{{$results['imgSrc']}}" />
 				<br>
-				<input
-					type="text"
-					id="propertyPrice"
-					class="number-input"
-					placeholder="Propery Price?"
-					oninput="formatNumberInput(this)"
-				/>
-				<input type="hidden" value="{{$results['id']}}" id="propertyId">
-				<br>
+				<div class="tabs-container">
+					<input
+						type="text"
+						id="propertyPrice"
+						class="number-input"
+						placeholder="Property Price?"
+						oninput="formatNumberInput(this)"
+					/>
+				</div>
+				<input type="hidden" value="{{$id}}" id="propertyId">
 				<table>
 					<tr>
 						<td><b>State:</b><br>{{ !empty( $results['state'] ) ? $results['state']->state: 'Unknown' }} </td>
@@ -47,3 +48,25 @@
 		<button id="game-button" onclick="checkResults()" class="submit-button"><span>Make Your Guess</span></button>
 	</div>
 </div>
+<div class="timer-container">
+	<div class="timer" id="countdown">15</div>
+</div>
+
+<script>
+	var countdownElement = document.getElementById('countdown');
+	var countdown = 20;
+
+	function updateCountdown() {
+			countdown--;
+			countdownElement.textContent = countdown;
+
+			if( countdown === 0 )
+			{
+				countdownElement.textContent = "Time's up!";
+				clearInterval(timerInterval);
+				checkResults( true );
+			}
+	}
+
+	var timerInterval = setInterval(updateCountdown, 1000);
+</script>

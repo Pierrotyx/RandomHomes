@@ -1,6 +1,6 @@
-<div class="info-box">
+<div class="info-box stretch">
 	<div class="filter-wrapper">
-		<h2 class="title">Results</h2>
+		<h2 class="title">{{ ( $results->type == 'ForRent' ? 'Rent' : 'Sale' ) }} Results</h2>
 		<hr />
 		<div id="result-body">
 			<?php
@@ -42,11 +42,12 @@
 				}
 				else
 				{
+					$propName = $results->type == 'ForRent' ? 'Rental' : 'Sale';
 					?>
 					<table>
 						<tr>
-							<td><b>Property Price:</b><br>{{!empty( $results->price ) ? ( '$' . number_format( $results->price ) ) : '--'}}</td>
-							<td><b>Property Type:</b><br>{{!empty( $results->propertyType ) ? $results->propertyType : '--'}}</td>
+							<td><b>{{ $propName }} Price:</b><br>{{!empty( $results->price ) ? ( '$' . number_format( $results->price ) ) : '--'}}</td>
+							<td><b>{{ $propName }} Type:</b><br>{{!empty( $results->propertyType ) ? $results->propertyType : '--'}}</td>
 						</tr>
 						<tr>
 							<td><b>Bedrooms:</b><br>{{!empty( $results->bedrooms ) ? $results->bedrooms : '--'}}</td>
@@ -68,7 +69,6 @@
 		{
 			?>
 			<div class="side-buttons">
-				<a href="/"><button id="return-button" class="submit-button"><span>New Home</span></button></a>
 				<form method="POST" action="/reroll" class="side-buttons">
 				@csrf <!-- {{ csrf_field() }} -->
 					<input type="hidden" name="type" id="type" value="{{$id}}" />
@@ -76,6 +76,7 @@
 						<span>Reroll</span>
 					</button>
 				</form>
+				<a href="/"><button id="return-button" class="submit-button"><span>Change Filters</span></button></a>
 			</div>
 			<?php
 		}

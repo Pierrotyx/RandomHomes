@@ -23,7 +23,18 @@ class Houses extends Controller
         }
         else
         {
-            return view( 'randomHouse', [ 'states' => $this->getStates() ] );
+            $states = $this->getStates();
+            $parameters = [
+                'head' => 'templates.heads.home',
+                'body' => 'apps.random.filters',
+                'parameters' => [ 'states' => $states ],
+                'startIcon' => 'home',
+                'description' => 'descriptions.main',
+                'states' => $states,
+                'citiesRent' => !empty( Session::get( 'state-rent' ) ) ? $this->getCities( Session::get( 'state-rent' ), Session::get( 'city-rent' ) ?? null ) : null,
+                'citiesSale' => !empty( Session::get( 'state-sale' ) ) ? $this->getCities( Session::get( 'state-sale' ), Session::get( 'city-sale' ) ?? null ) : null
+            ];
+            return view( 'randomHouse', $parameters );
         }
     }
 
@@ -53,6 +64,10 @@ class Houses extends Controller
                 return view(
                         'randomHouse',
                         [
+                            'head' => 'templates.heads.home',
+                            'body' => 'apps.random.results',
+                            'parameters' => ['results' => $results],
+                            'startIcon' => 'home',
                             'results' => $results,
                             'filters' => $this->getFilters( $request->get('home') ),
                             'id' => $request->get('home'),
@@ -61,7 +76,40 @@ class Houses extends Controller
                 );
             }
         }
+
+        return view(
+                'randomHouse',
+                [
+                    'head' => 'templates.heads.home',
+                    'body' => 'apps.random.allHomes',
+                    'startIcon' => 'home',
+                    'homeSales' => $this->getAllHomes('ForSale', $request->get('page') ?? 1 ),
+                    'homeRents' => $this->getAllHomes('ForRent', $request->get('page') ?? 1 ),
+                    'filters' => $this->getFilters( $request->get('home') ),
+                    'id' => $request->get('home'),
+                    'units' => $units ?? false
+                ]
+        );
         return Redirect::to( '/' );
+    }
+    
+    public function priceLeaderboard()
+    {
+        $priceLeaderboard = DB::table( 'leaderboard' )
+            ->limit( 500 )
+            ->orderByDesc( 'score' )
+            ->get()
+        ;
+
+        return view(
+            'randomHouse',
+            [
+                'head'      => 'templates.heads.home',
+                'body'      => 'apps.placethatprice.leaderboard',
+                'startIcon' => 'game',
+                'boardInfo' => $priceLeaderboard
+            ]
+        );
     }
 
     public function reroll( Request $request )
@@ -69,7 +117,34 @@ class Houses extends Controller
         $filters = Filters::getTranslatedFilters( $request->type );
         $homeId = $this->newSrc( $filters );
         //$this->setSessions( $filters );
-        return Redirect::to( '/results?home=' . $homeId );
+        return !$homeId ? Redirect::to( '/?fail=1' ) : Redirect::to( '/results?home=' . $homeId );
+    }
+
+    private function getAllHomes( $type, $page )
+    {
+        $query = DB::table('homes')
+            ->whereIn('id', function ($query) use( $type ) {
+                $query->select(DB::raw('MAX(id)'))
+                    ->from('homes')
+                    ->groupBy('address')
+                    ->where('clicked', '=', true)
+                    ->where('type', '=', $type);
+            })
+        ;
+        
+        $count = $query->select(DB::raw('count(*) as total'))->first()->total;
+
+        $homes = $query
+            ->select(
+                'homes.*',
+                DB::raw('(SELECT COUNT(*) FROM subHomes WHERE subHomes.homeId = homes.id) as unitCount'),
+                DB::raw('(SELECT MIN(price) FROM subHomes WHERE subHomes.homeId = homes.id) as rentPrice')
+            )
+            ->offset(( $page - 1 ) * 50)
+            ->limit(50)
+            ->latest('timestamp')
+        ;
+        return ['data' => $homes->get(), 'count' => $count];
     }
 
     public function clicked( Request $request )
@@ -80,64 +155,51 @@ class Houses extends Controller
         ;
     }
     
-    public function homePrice( Request $request )
-    {
-        if( $request->isMethod( 'post' ) )
-        {
-            $homeId = $this->newSrc( $request->all() );
-            return Redirect::to( '/results?home=' . $homeId );
-        }
-        else
-        {
-            return view( 'randomHouse', [ 'states' => $this->getStates() ] );
-        }
-    }
 
     public function newGame( Request $request )
     {
-        $count = DB::table('homes')->count();
-        if( $count > 10000 and rand( 1, $count + 1000 ) > 1000 )
-        {
-            $state = DB::table( 'homes' )
-                ->inRandomOrder()
-            ;
-        }
-        else
-        {
-            $homeType = rand(1, 100);
-            if( $homeType > 50 )
-            {
-                $homeType = ['Houses'];
-            }
-            elseif( $homeType > 25 )
-            {
-                $homeType = ['Condos'];
-            }
-            else
-            {
-                $homeType = ['Townhomes'];
-            }
-            $customRequest = [
-                'type'          => 'ForSale',
-                'minsp'         => rand( 20000, 750000),
-                'home_type'     => $homeType,
-                'bedsMinSale'   => 1,
-                'maxsp'         => null,
-                'bathsMinSale'  => null,
-                'bathsMaxSale'  => null,
-                'bedsMaxSale'   => null
-            ];
+        $gameProperties = Session::get( 'gameProperties' ) ?? [];
+        $results = ( array ) DB::table( 'homes' )
+            ->select( 'homes.*' )
+            ->whereIn('id', function ($query) {
+                $query->select(DB::raw('MAX(id)'))
+                    ->from('homes')
+                    ->where( 'type', '=', 'ForSale' )
+                    //->whereIn( 'propertyType', ['SINGLE_FAMILY', 'TOWNHOUSE', 'CONDO'] )
+                    ->groupBy('address');
+            })
+            ->whereNotIn( 'id', $gameProperties )
+            ->where( 'price', '<', 10000000 )
+            ->where( 'price', '>', 50000 )
+            ->where( 'bedrooms', '>', 0 )
+            ->where( 'bathrooms', '>', 0 )
+            ->inRandomOrder()
+            ->first()
+        ;
 
-            $results = json_decode( json_encode( $this->getHome( $this->newSrc( $customRequest, true ), 'tempHomes' ) ), true );
-            $state = substr( explode( ', ', $results['address'] )[2], 0, 2 );
-            $results['state'] = DB::table( 'states' )
-                ->select( 'state' )
-                ->where( 'stateCode', '=', strtoupper( $state ) )
-                ->first()
-            ;
-            $html = view('homePriceGenerate', ['results' => $results, 'test' => $results, 'round' => $request->count ] )->render();
-            return response()->json( ['html' => $html] );
-        }
+        do
+        {
+            $randomId = '';
+            for( $i = 0; $i < 16; $i++ )
+            {
+                $randomId .= chr( mt_rand( 97, 122 ) );
+            }
+            
+            $exists = DB::table('gameTemp')->where('generateId', '=', $randomId )->exists();
+        } while( $exists );
+        
+        DB::table('gameTemp')->insert([ 'homeId' =>  $results['id'], 'generateId' => $randomId ]);
+        array_push( $gameProperties, $results['id'] );
+        Session::put( 'gameProperties', $gameProperties );
+
+        $state = substr( explode( ', ', $results['address'] )[2], 0, 2 );
+        $results['state'] = DB::table( 'states' )
+            ->select( 'state' )
+            ->where( 'stateCode', '=', strtoupper( $state ) )
+            ->first()
+        ;
+        $html = view('apps.placethatprice.newHome', ['results' => $results, 'id' => $randomId, 'round' => $request->count ] )->render();
+        return response()->json( ['html' => $html] );
         
     }
 
@@ -147,40 +209,102 @@ class Houses extends Controller
         if( $request->count == 1 )
         {
             Session::put( 'score', 0 );
+            Session::put( 'gameInfo', [] );
+            
+            do
+            {
+                $randomId = '';
+                for( $i = 0; $i < 16; $i++ )
+                {
+                    $randomId .= chr( mt_rand( 97, 122 ) );
+                }
+                
+                $exists = DB::table('leaderboard')->where('userId', '=', $randomId )->exists();
+            } while( $exists );
+            
+            Session::put( 'userId', $randomId );
         }
 
-        if( $property = DB::table('tempHomes')->where( 'id', '=', $request->id )->first() )
+        $propertyId = DB::table('gameTemp')->where('generateId', '=', $request->id )->first()->homeId;
+        $property = DB::table('homes')->where( 'id', '=', $propertyId )->first();
+        DB::table('gameTemp')->where( 'generateId', '=', $request->id )->delete();
+        //Max 50,000 points
+        // 10,000 points per round
+
+        if( empty( $request->propertyPrice ) )
         {
-            //Max 50,000 points
-            // 10,000 points per round
+            $points = 0;
+        }
+        else
+        {
             $divisor = max( $property->price / 500000, 1 );
             $diff = abs( $property->price - $request->propertyPrice ) / $divisor;
             $points = ceil( 10000 * exp( -0.00000445 * $diff ) ); // \ 10000 * e^{-0.000005 * $diff}
             $points = max(0, min(10000, $points ) );
-            
-            Session::put( 'score', Session::get( 'score' ) + $points );
-            DB::table('tempHomes')->where( 'id', '=', $request->id )->delete();
-
-            unset( $property->id );
-            DB::table('homes')->insert( (array) $property );
-
-            $html = view(
-                'homePriceScore',
-                [
-                    'points'   => round( $points ),
-                    'total'    => ceil( Session::get( 'score' ) ),
-                    'guess'    => $request->propertyPrice,
-                    'property' => $property,
-                    'round'    => $request->count,
-                ]
-            )->render();
-            return response()->json( ['html' => $html] );
-        }
-        else
-        {
-            return $request->id . ' test';
         }
         
+        $info =
+        [
+            'img'     => $property->imgSrc,
+            'address' => $property->address,
+            'url'     => $property->url,
+            'score'   => $points,
+            'price'   => $property->price
+        ];
+        Session::put( 'score', Session::get( 'score' ) + $points );
+        $currentGame = Session::get( 'gameInfo' );
+        array_push( $currentGame, $info );
+        Session::put( 'gameInfo', $currentGame );
+
+        $html = view(
+            'apps.placethatprice.score',
+            [
+                'total'    => ceil( Session::get( 'score' ) ),
+                'guess'    => $request->propertyPrice,
+                'info'     => $info,
+                'round'    => $request->count,
+            ]
+        )->render();
+        return response()->json( ['html' => $html] );
+    }
+    
+    public function changeName( Request $request )
+    {
+        if( empty( Session::get( 'userId' ) ) )
+        {
+            return json_encode('false');
+        }
+
+        DB::table( 'leaderboard' )
+            ->where( 'userId', Session::get( 'userId' ) )
+            ->update( [ 'name' =>  $request->name ] )
+        ;
+        
+        return json_encode('true');
+    }
+    
+    public function finalScore( Request $request )
+    {
+        Session::put( 'round', 0 );
+        DB::table('leaderboard')->insert(
+            [
+                'name' =>  'Anonymous',
+                'score' => ceil( Session::get( 'score' ) ),
+                'userId' => Session::get( 'userId' )
+            ]
+        );
+        
+        $position = DB::table('leaderboard')
+            ->selectRaw('COUNT(*) + 1 as position')
+            ->where('score', '>', DB::table('leaderboard')->where( 'userId', Session::get( 'userId' ) )->value('score'))
+            ->first()
+        ;
+
+        // Reset the row number variable
+        DB::select( DB::raw( 'SET @row_number = 0' ) );
+
+        $html = view( 'apps.placethatprice.finalScore', [ 'rank' => $position->position ] )->render();
+        return response()->json( ['html' => $html] );
     }
     
     private function getStates()
@@ -189,6 +313,37 @@ class Houses extends Controller
             ->select('state', 'stateCode')
             ->get()
         ;
+    }
+    
+    private function getCities( $state, $selected = null )
+    {
+        if( empty( $state ) )
+        {
+            return false;
+        }
+
+        $cities = DB::table( 'population' )
+            ->select('city')
+            ->where( 'State', '=', $state )
+            ->where( 'Population', '>', 1000 )
+            ->orderBy( 'city', 'ASC' )
+            ->distinct()
+            ->get()
+        ;
+        
+        $cityHtml = '<option value="">Select a City...</option>';
+        foreach( $cities as $city )
+        {
+            $selectValue = $selected == $city->city ? 'selected' : '';
+            $cityHtml .= '<option value="' . $city->city . '" ' . $selectValue . '>' . $city->city . '</option>';
+        }
+        
+        return $cityHtml;
+    }
+    
+    public function citiesOptions( Request $request )
+    {
+        return json_encode( $this->getCities( $request->state ) );
     }
     
     private function getParameters( $request )
@@ -202,10 +357,15 @@ class Houses extends Controller
                 'BathsMinRent' => 'bathsMinRent',
                 'BathsMaxRent' => 'bathsMaxRent',
                 'BedsMinRent' => 'bedsMinRent',
-                'BedsMaxRent' => 'bedsMaxRent'
+                'BedsMaxRent' => 'bedsMaxRent',
+                'LivingMinRent' => 'livingMinRent',
+                'LivingMaxRent' => 'livingMaxRent',
+                'LotMinRent' => 'lotMinRent',
+                'LotMaxRent' => 'lotMaxRent'
             ];
 
             $state = $request['state-rent'] ?? '';
+            $city = $request['city-rent'] ?? '';
         }
         elseif( $request['type'] == 'ForSale' )
         {
@@ -216,17 +376,22 @@ class Houses extends Controller
                 'BathsMinSale' => 'bathsMinSale',
                 'BathsMaxSale' => 'bathsMaxSale',
                 'BedsMinSale' => 'bedsMinSale',
-                'BedsMaxSale' => 'bedsMaxSale'
+                'BedsMaxSale' => 'bedsMaxSale',
+                'LivingMinSale' => 'livingMinSale',
+                'LivingMaxSale' => 'livingMaxSale',
+                'LotMinSale' => 'lotMinSale',
+                'LotMaxSale' => 'lotMaxSale'
             ];
 
             $state = $request['state-sale'] ?? '';
+            $city = $request['city-sale'] ?? '';
         }
         else
         {
             return;
         }
 
-        $parameters = new Parameter( $request['type'], $this->getState( $state ) );
+        $parameters = new Parameter( $request['type'], $this->getState( $state ), $city );
 
         foreach( $parametersList as $key => $parameter )
         {
@@ -317,6 +482,7 @@ class Houses extends Controller
                 'minPrice' => $request['minsp'] ?? null,
                 'MaxPrice' => $request['maxsp'] ?? null,
                 'state' => $request['state-sale'] ?? null,
+                'city' => $request['city-sale'] ?? null,
                 'isHouse' => in_array( 'Houses', $request['home_type'] ),
                 'isCondo' => in_array( 'Condos', $request['home_type'] ),
                 'isMulti' => in_array( 'Multi-family', $request['home_type'] ),
@@ -326,7 +492,11 @@ class Houses extends Controller
                 'minBed' => $request['bedsMinSale'] ?? null,
                 'maxBed' => $request['bedsMaxSale'] ?? null,
                 'minBath' => $request['bathsMinSale'] ?? null,
-                'maxBath' => $request['bathsMaxSale'] ?? null
+                'maxBath' => $request['bathsMaxSale'] ?? null,
+                'minLiving' => $request['livingMinSale'] ?? null,
+                'maxLiving' => $request['livingMaxSale'] ?? null,
+                'minLot' => $request['lotMinSale'] ?? null,
+                'maxLot' => $request['lotMaxSale'] ?? null
             ];
         }
         else
@@ -337,13 +507,18 @@ class Houses extends Controller
                 'minPrice' => $request['minrp'] ?? null,
                 'MaxPrice' => $request['maxrp'] ?? null,
                 'state' => $request['state-rent'] ?? null,
+                'city' => $request['city-rent'] ?? null,
                 'isHouse' => in_array( 'Houses', $request['home_type_rent'] ),
                 'isCondo' => in_array( 'Apartments_Condos_Co-ops', $request['home_type_rent'] ),
                 'isTownHome' => in_array( 'Townhomes', $request['home_type_rent'] ),
                 'minBed' => $request['bedsMinRent'] ?? null,
                 'maxBed' => $request['bedsMaxRent'] ?? null,
                 'minBath' => $request['bathsMinRent'] ?? null,
-                'maxBath' => $request['bathsMaxRent'] ?? null
+                'maxBath' => $request['bathsMaxRent'] ?? null,
+                'minLiving' => $request['livingMinRent'] ?? null,
+                'maxLiving' => $request['livingMaxRent'] ?? null,
+                'minLot' => $request['lotMinRent'] ?? null,
+                'maxLot' => $request['lotMaxRent'] ?? null
             ];
         }
 

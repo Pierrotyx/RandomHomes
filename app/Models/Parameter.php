@@ -60,20 +60,46 @@ class Parameter
 	 *  @var int $bedsMax the maximum number of beds.
 	 */
 	public $bedsMax = null;
+    
+     /**
+	 *  @var int $livingMin the minimum size of living area in sqft.
+	 */
+	public $livingMin = null;
+
+    /**
+	 *  @var int $livingMax the maximum size of living area in sqft.
+	 */
+	public $livingMax = null;
+
+    /**
+	 *  @var int $lotMin the minimum size of lot area in sqft.
+	 */
+	public $lotMin = null;
+
+    /**
+	 *  @var int $lotMax the minimum size of lot area in sqft.
+	 */
+	public $lotMax = null;
 
     /**
 	 *  @var int $rentMaxPrice the maximum price for renting property.
 	 */
 	public $homeType = [];
+    
+    /**
+	 *  @var bool $hasCity checks if user is searching with a city.
+	 */
+	public $hasCity = false;
 
     /**
 	 *  When declaring object, must give the property status and the state object.
 	 */
-    function __construct( $type, $state )
+    function __construct( $type, $state, $city )
     {
         $this->state = $state;
         $this->statusType = $type;
-        $this->location = $state->stateCode;
+        $this->hasCity = !empty( $city );
+        $this->location = ( $this->hasCity ? ( $city . ', ' ) : '' ) . $state->stateCode;
         $intList = ['minrp', 'maxrp', 'minsp', 'maxsp'];
     }
 
@@ -91,6 +117,10 @@ class Parameter
             'bathsMax'     => $this->bathsMax,
             'bedsMin'      => $this->bedsMin,
             'bedsMax'      => $this->bedsMax,
+            'sqftMin'      => $this->livingMin,
+            'sqftMax'      => $this->livingMax,
+            'lotSizeMin'   => $this->lotMin,
+            'lotSizeMax'   => $this->lotMax,
         ];
 
         $parameters = [];
@@ -136,7 +166,7 @@ class Parameter
         {
             $this->minPrice = $num;
         }
-        else
+        elseif( !$this->hasCity )
         {
             $numberSet = [
                 10  => null,
@@ -164,10 +194,11 @@ class Parameter
         {
             $this->maxPrice =  $this->minPrice * 1.5 + $this->state->avgHousePrice / 4 + 50000;
         }
-        elseif( $this->minPrice >= $this->state->avgHousePrice * 2.5 ) // If min value is maxed out..
+        elseif( $this->minPrice >= $this->state->avgHousePrice * 2.5 or $this->hasCity ) // If min value is maxed out..
         {
             // Leave max value null to get any value for max
         }
+        /*
         else
         {
             $numberSet = [
@@ -184,6 +215,7 @@ class Parameter
             ];
             $this->minPrice = $this->randomNumber( $numberSet );
         }
+        */
 
         if( $this->minPrice >= $this->maxPrice and !is_null( $this->maxPrice ) )
         {
@@ -197,7 +229,7 @@ class Parameter
         {
             $this->rentMinPrice = $num;
         }
-        else
+        elseif( !$this->hasCity )
         {
             $numberSet = [
                 10  => null,
@@ -221,7 +253,7 @@ class Parameter
         {
             $this->rentMaxPrice = $num;
         }
-        elseif( $this->rentMinPrice >= $this->state->avgRentPrice * 3 ) // If min value is maxed out..
+        elseif( $this->rentMinPrice >= $this->state->avgRentPrice * 3 or $this->hasCity ) // If min value is maxed out..
         {
             // Leave max value null to get any value for max
         }
@@ -313,12 +345,76 @@ class Parameter
             $this->bedsMax = $num;
         }
     }
-
+    
     public function putBedsMaxRent( $num = null )
     {
         if( !empty( $num ) )
         {
             $this->bedsMax = $num;
+        }
+    }
+
+    public function putLivingMinSale( $num = null )
+    {
+        if( !empty( $num ) )
+        {
+            $this->livingMin = $num;
+        }
+    }
+
+    public function putLivingMinRent( $num = null )
+    {
+        if( !empty( $num ) )
+        {
+            $this->livingMin = $num;
+        }
+    }
+
+    public function putLivingMaxSale( $num = null )
+    {
+        if( !empty( $num ) )
+        {
+            $this->livingMax = $num;
+        }
+    }
+
+    public function putLivingMaxRent( $num = null )
+    {
+        if( !empty( $num ) )
+        {
+            $this->livingMax = $num;
+        }
+    }
+
+    public function putLotMinSale( $num = null )
+    {
+        if( !empty( $num ) )
+        {
+            $this->lotMin = $num;
+        }
+    }
+
+    public function putLotMinRent( $num = null )
+    {
+        if( !empty( $num ) )
+        {
+            $this->lotMin = $num;
+        }
+    }
+
+    public function putLotMaxSale( $num = null )
+    {
+        if( !empty( $num ) )
+        {
+            $this->lotMax = $num;
+        }
+    }
+
+    public function putLotMaxRent( $num = null )
+    {
+        if( !empty( $num ) )
+        {
+            $this->lotMax = $num;
         }
     }
 }

@@ -62,6 +62,14 @@ table
 
 .sidebar, .screen-wrap
 {
+	min-height: 75vh;
+	height: 700px;
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
+.stretch
+{
 	height: 1000px;
 }
 
@@ -87,7 +95,12 @@ table
 
 #game-button
 {
-	background-color: #3498db
+	background-color: #3498db;
+}
+
+#leaderboard-button
+{
+	background-color: #34db90;
 }
 
 .submit-button:hover {
@@ -143,7 +156,7 @@ table
 	padding: 5px;
 	border-radius: 2em;
 	border: 2px dotted black;
-	height: 100%;
+	height: fit-content;
 }
 
 .filter-body {
@@ -178,9 +191,15 @@ label
 	margin-bottom: 5px;
 }
 
-input, select
+input
 {
 	width:100%;
+	font-size: 120%;
+}
+
+select
+{
+	width:100px;
 	font-size: 120%;
 }
 
@@ -190,69 +209,69 @@ input, select
 		align-items: center;
 	}
 
-	.tab {
-		padding: 10px 30px;
-		background-color: #ccc;
-		color: #000;
-	font-size: 125%;
-		font-weight: bold;
-		transition: background-color 0.5s;
-	width: 40%;
+.tab {
+	padding: 10px 30px;
+	background-color: #ccc;
+	color: #000;
+font-size: 125%;
+	font-weight: bold;
+	transition: background-color 0.5s;
+width: 40%;
+text-align: center;
+border-top-left-radius: 2em;
+	border-top-right-radius: 2em;
+}
+
+.tab.buying-tab {
+	background-color: #A3000B; /* Change color for Buying tab */
+	color: #fff; /* Change text color for Buying tab */
+}
+
+.tab.renting-tab {
+	background-color: #7A48D6; /* Change color for Renting tab */
+	color: #fff; /* Change text color for Renting tab */
+}
+
+.tab:not(:last-child)
+{
+	margin-right: 2%; /* Add gap between tabs */
+}
+
+.tab-clicked
+{
+	filter: brightness(65%);
+}
+
+.tab:hover:not(.tab-clicked)
+{
+	filter: brightness(65%);
+	cursor: pointer;
+}
+
+#rent-filters, #submit-rent
+{
+	display: none;
+}
+
+footer {
+	background-color: #0a4061;
+	color: white;
 	text-align: center;
-	border-top-left-radius: 2em;
-		border-top-right-radius: 2em;
-	}
+	padding: 20px 10px;
+	margin: 10px auto 0 auto;
+	border-radius: 2em;
+	max-width: 1150px;
+}
 
-	.tab.buying-tab {
-		background-color: #A3000B; /* Change color for Buying tab */
-		color: #fff; /* Change text color for Buying tab */
-	}
+footer a {
+	color: #1277e1;
+}
 
-	.tab.renting-tab {
-		background-color: #7A48D6; /* Change color for Renting tab */
-		color: #fff; /* Change text color for Renting tab */
-	}
-	
-	.tab:not(:last-child)
-	{
-		margin-right: 2%; /* Add gap between tabs */
-	}
-	
-	.tab-clicked
-	{
-		filter: brightness(65%);
-	}
-
-	.tab:hover:not(.tab-clicked)
-	{
-		filter: brightness(65%);
-		cursor: pointer;
-	}
-	
-	#rent-filters, #submit-rent
-	{
-		display: none;
-	}
-	
-	footer {
-		background-color: #0a4061;
-		color: white;
-		text-align: center;
-		padding: 20px 10px;
-		margin: 10px auto 0 auto;
-		border-radius: 2em;
-		max-width: 1150px;
-	}
-
-	footer a {
-		color: #1277e1;
-	}
-
-	footer > p > a > svg
-	{
-		width:50px;
-		margin: 0 10px 10px 10px;
-	}
+footer > p > a > svg
+{
+	width:50px;
+	margin: 0 10px 10px 10px;
+}
 
 .form-row
 {
@@ -272,7 +291,7 @@ input, select
 
 .state
 {
-	width: 12rem;
+	width: 10rem;
 }
 
 .check
@@ -309,42 +328,63 @@ input, select
     width: 100%;
 }
 
-.menu {
+.links-info {
     list-style: none;
     padding: 0;
     text-align: left; /* Align the menu text to the left */
+	display: none;
 }
 
-.menu ul
+.links-info ul
 {
 	padding-inline-start: 0;
 }
 
-.menu li {
+.links-info li {
     margin-bottom: 10px;
 	list-style-type: none;
 	transition: background-color 0.5s ease;
-	border-radius: 5px;
 	border-radius: 1em;
+	padding: 8px 15px;
 }
 
-.menu li a {
-	display:block;
-    color: #fff;
+.links-info li a {
     text-decoration: none;
     font-size: 18px;
-    padding: 8px 15px;
+	color: white;
 }
 
-.menu li:hover, .sidebar-tab:hover, .bars .active
+.links-info > a
+{
+	color: white;
+	display: flex;
+  	align-items: center; /* Vertically center the items */
+	text-decoration: none;
+	border-radius: 2rem;
+	padding-left: 15px;
+}
+
+.links-info > a > svg
+{
+	margin-right: 15px;
+	width: 40px;
+	height: 40px;
+}
+
+.links-info li:hover,
+.sidebar-tab:hover,
+.bars .active,
+.links-info a,
+.links svg
 {
     cursor: pointer;
+	transition: background-color 0.5s ease;
 }
 
 .sidebar-tab
 {
 	color:white;
-	padding: 10px;
+	padding: 10px 0;
 	text-decoration: none;
 	display: flex;
     flex-flow: column;
@@ -415,9 +455,12 @@ a:hover
 	background-color: #432c6f;
 }
 
-.sidebar-tab:hover
+.sidebar-tab:hover,
+.links > svg:hover,
+.links-info > a:hover,
+.pressed
 {
-	background-color: #25173a;
+	background-color: #542e91;
 }
 
 #overlay
@@ -464,6 +507,204 @@ a:hover
     width: 45%;
 }
 
+.description
+{
+	max-width: 1090px;
+	align-items: center;
+	flex: 1;
+	padding: 20px;
+	background-color: #e6e6e6;
+	border-radius: 2em;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+	display: block;
+	margin: 0 auto;
+	font-size: 120%;
+}
+
+.links
+{
+	display: grid;
+	grid-template-columns: repeat(4, 1fr); /* Four columns with equal width */
+	gap: 10px; /* Adjust the gap between the boxes as needed */
+	width: 75%;
+	margin: 0 auto;
+}
+
+.links svg
+{
+	transition: background-color 0.5s ease;
+	border-radius: 1em;
+	padding: 5px;
+	margin: 0 auto;
+	width: 45px;
+	height: 45px;
+}
+
+.list-img
+{
+	width: 80%;
+	margin-top: 10px;
+}
+
+.list-grid
+{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr); /* Four columns with equal width */
+	gap: 10px; /* Adjust the gap between the boxes as needed */
+	width: 100%;
+	margin: 0 auto;
+}
+
+.list-element
+{
+	border-radius: 1em;
+}
+
+.list-element:hover
+{
+	background-color: #a6a6a6;
+}
+
+.grid-link
+{
+	color: black;
+	text-decoration: none;
+	font-size: 100%;
+}
+
+.score-screen {
+    text-align: center;
+    background-color: #8a58cb;
+    padding: 20px;
+    border-radius: 2em;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.title {
+    color: #333;
+}
+
+#result-body {
+    margin-top: 20px;
+}
+
+.points {
+    font-size: 36px;
+    color: white;
+}
+
+/* Style for other text elements */
+.score-screen h2
+{
+    color: white;
+}
+
+.total
+{
+	color: white;
+	text-decoration: underline;
+}
+
+/* Style for the link */
+.score-screen a {
+    text-decoration: none;
+    color: #6dff51;
+    font-weight: bold;
+}
+
+.score-screen a:hover
+{
+    text-decoration: underline;
+}
+
+.gameResults
+{
+	display: flex;
+    align-items: center; /* Vertically center content */
+	font-size: 150%;
+	width: 100%;
+}
+
+.gameResults img
+{
+	width: 100px;
+	height: 100px;
+	margin-right: 10px;
+}
+
+#propertyPrice
+{
+	width:50%;
+	text-align:center;
+	font-size: 150%;
+}
+
+.timer-container {
+  	position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: rgb(40,40,40,.7);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1; /* Add z-index to ensure it stays above other content */
+}
+
+.timer {
+    font-size: 200%;
+    font-weight: bold;
+}
+
+.result-grid
+{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-gap: 10px;
+	padding: 0;
+}
+
+.gameSubmit
+{
+	margin: 0 auto;
+	width: 40%;
+}
+
+.leaderboard {
+    max-width: 400px;
+    margin: 20px auto;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.leaderboard-header {
+    display: flex;
+    background-color: #34db90;
+    color: #fff;
+    font-weight: bold;
+}
+
+.leaderboard-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.leaderboard-row.odd {
+    background-color: #f9f9f9;
+}
+
+.leaderboard-row.even {
+    background-color: #e5e5e5;
+}
+
+.rank, .player, .score {
+    flex: 1;
+    text-align: center;
+}
+
 /*===============================================================*/
 /* CSS with max-width of 768px
 /*===============================================================*/
@@ -498,12 +739,32 @@ a:hover
 	    margin-right: 0px; /* Add some space between buttons if needed */
 	    width: 100%;
 	}
+	.list-img
+	{
+		width: 50%;
+	}
+	
+	.grid-link
+	{
+		font-size: 90%;
+	}
 }
 /*===============================================================*/
 /* CSS with max-width of 800px
 /*===============================================================*/
 @media (max-width: 750px)
 {
+	.gameSubmit
+	{
+		width: 60%;
+	}
+
+	#propertyPrice
+	{
+		width:75%;
+		font-size: 150%;
+	}
+
 	footer
 	{
 		margin: 10px 0 0 0;
@@ -519,20 +780,11 @@ a:hover
 	    font-size: 125%;
 	}
 
-	h1
-	{
-		font-size: 160%;
-	}
 	.menu-wrapper
 	{
 		display: none;
 	}
 
-	.pressed
-	{
-		display: block;
-		background-color: #542e91;
-	}
 	.bars
 	{
 		display:block;
@@ -547,14 +799,14 @@ a:hover
 	{
 		padding:5px;
 	}
-	.menu li a {
+	.links-info li a {
 		width: inherit;
 	}
 	.sidebar-icon img
 	{
-	    width: 50px;
-	    height: 50px;
-	    margin: 10px 10px 0 0;
+	    width: 60px;
+	    height: 60px;
+	    margin: 0;
 	}
 
 	.container
@@ -578,8 +830,9 @@ a:hover
 	{
 		display: flex;
 		flex-direction: row;
-		 align-items: stretch;
-		 width:100%;
+		align-items: stretch;
+		justify-content: left;
+		width:100%;
 	}
 
 	.sidebar-tab
@@ -621,7 +874,7 @@ a:hover
 
 	.state
 	{
-		width: 10rem;
+		width: 100%;
 	}
 
 	.button-wrapper {
@@ -643,6 +896,11 @@ a:hover
 		padding:5px;
 		padding-top: 25px;
 		height: inherit;
+	}
+	
+	.screen-wrap:has(> .compress)
+	{
+		height: 600px;
 	}
 	
 	.button-wrapper button span {
@@ -676,8 +934,15 @@ a:hover
 
 	.sidebar, .screen-wrap
 	{
-		width:90%;
+		width:95%;
 	}
+	
+	 .description
+	 {
+		width:calc( 95% - 30px);
+		padding: 10px 20px;
+		margin: 0;
+	 }
 
 	#preview-img
 	{
@@ -686,16 +951,73 @@ a:hover
 }
 @media (max-width: 500px)
 {
+	.gameSubmit
+	{
+		width: 80%;
+	}
+
+	.result-grid
+	{
+		grid-template-columns: repeat(1, 1fr);
+		grid-gap: 5px;
+		padding: 0;
+	}
+	
+	.gameResults img
+	{
+		width: 80px;
+		height: 80px;
+		margin-right: 10px;
+	}
+
+	.gameResults
+	{
+		font-size: 120%;
+	}
+
+	#propertyPrice
+	{
+		width:85%;
+		font-size: 125%;
+	}
+
 	.side-buttons a, .side-buttons form
 	{
 	    display: block; /* Display buttons inline */
 	    margin-right: 0px; /* Add some space between buttons if needed */
 	    width: 100%;
 	}
+	
+	select
+	{
+		width: 100%;
+	}
+	
+	.list-grid
+	{
+		gap: 5px; /* Adjust the gap between the boxes as needed */
+		width: 100%;
+		margin: 0 auto;
+	}
+	
+	.list-img
+	{
+		width: 100%;
+	}
 }
 
 @media (max-width: 400px)
 {
+	.links
+	{
+		width: 100%;
+	}
+
+	#home-links
+	{
+		display: none;
+	}
+
 	.state, .input-box
 	{
 		width: 100%;
@@ -703,6 +1025,21 @@ a:hover
 
 	h1
 	{
-		font-size: 125%;
+		font-size: 140%;
+	}
+
+	input, select
+	{
+		font-size: 110%;
+	}
+	
+	.links-info li a
+	{
+		padding: 2px 4px;
+	}
+	
+	.grid-link
+	{
+		font-size: 80%;
 	}
 }
