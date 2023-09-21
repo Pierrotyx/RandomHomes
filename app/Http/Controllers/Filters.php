@@ -40,10 +40,15 @@ class Filters extends Controller
                 'minPrice' => 'minrp',
                 'MaxPrice' => 'maxrp',
                 'state' => 'state-rent',
+                'city' => 'city-rent',
                 'minBed' => 'bedsMinRent',
                 'maxBed' => 'bedsMaxRent',
                 'minBath' => 'bathsMinRent',
                 'maxBath' => 'bathsMaxRent',
+                'minLiving' => 'livingMinRent',
+                'maxLiving' => 'livingMaxRent',
+                'minLot' => 'lotMinRent',
+                'maxLot' => 'lotMaxRent',
             ];
 
             $homeTypeName = 'home_type_rent';
@@ -60,10 +65,15 @@ class Filters extends Controller
                 'minPrice' => 'minsp',
                 'MaxPrice' => 'maxsp',
                 'state' => 'state-sale',
+                'city' => 'city-sale',
                 'minBed' => 'bedsMinSale',
                 'maxBed' => 'bedsMaxSale',
                 'minBath' => 'bathsMinSale',
                 'maxBath' => 'bathsMaxSale',
+                'minLiving' => 'livingMinSale',
+                'maxLiving' => 'livingMaxSale',
+                'minLot' => 'lotMinSale',
+                'maxLot' => 'lotMaxSale',
             ];
 
             $homeTypeName = 'home_type';
