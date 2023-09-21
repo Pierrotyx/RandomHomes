@@ -1,12 +1,49 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 	<head>
+		<?php
+		if( env('APP_ENV') == 'production' )
+		{
+			?>
+			<!-- Google tag (gtag.js) -->
+			<script async src="https://www.googletagmanager.com/gtag/js?id=G-36S4FCKE0S"></script>
+			<script>
+			  window.dataLayer = window.dataLayer || [];
+			  function gtag(){dataLayer.push(arguments);}
+			  gtag('js', new Date());
+
+			  gtag('config', 'G-36S4FCKE0S');
+			</script>
+			<?php
+		}
+		?>
+		<meta charset="UTF-8">
+		<link rel="icon" type="image/x-icon" href="{{ asset( '/favicon.ico' ) }}" sizes="16x16 32x32">
+		<link rel="icon" type="image/png" href="{{ asset( '/favicon.ico' ) }}" sizes="16x16 32x32">
+		<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="{{ asset( '/favicon.ico' ) }}">
+		<meta content="width=device-width, initial-scale=1" name="viewport" />
+		<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+		<meta name="csrf-token" content="{{ csrf_token() }}" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		
+		<link href="{{ asset( 'assets/css/style.css' ) }}" rel="stylesheet" />
+		<link rel="canonical" href="{{ url()->current() }}">
 		@include( $head )
 	</head>
 	<body>
 		<div id="overlay">
 			<div id="loader" class="loader"></div>
 		</div>
+		<?php
+		if( !empty( $header ) )
+		{
+			?>
+			<div class="header">	
+				@include( $header )
+			</div>
+			<?php
+		}
+		?>
 		<div class="container">
 			@include( 'templates.sidebar' )
 			<div class="screen-wrap">
@@ -44,7 +81,7 @@
 			};
 
 			$(document).ready(function() {
-				if( '{{Session::get('type') ?? ''}}' == 'ForRent' || '{{request()->type ?? ''}}' == 'ForRent' )
+				if( '{{request()->type ?? ''}}' == 'ForRent' )
 				{
 					$('#sale-filters, #rent-filters, #submit-rent, #submit-sale').toggle();
 				}

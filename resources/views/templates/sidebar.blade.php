@@ -1,4 +1,9 @@
-<?php $urlPath = parse_url(url()->current(), PHP_URL_PATH); ?>
+<?php
+$urlPath = parse_url(url()->current(), PHP_URL_PATH);
+$end = explode( '/', $urlPath );
+$inHome = is_numeric( end( $end ) );
+$pageExists = isset( request()->page );
+?>
 <div class="sidebar">
 	<div class="sidebar-icon">
 		<a href="/" class="sidebar-tab"><img src="{{asset( 'favicon.ico' )}}" alt="Menu Icon"><h1>Discover Random Homes</h1></a>
@@ -15,10 +20,10 @@
 	<hr>
 	<div class="menu-wrapper">
 		<nav id="home-links" class="links-info">
-			<a href="\" class="{{ $urlPath == '' ? 'pressed' : '' }}">
+			<a href="\" class="{{ ( $urlPath == '' or ( $inHome and !$pageExists ) )  ? 'pressed' : '' }}">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M274.9 34.3c-28.1-28.1-73.7-28.1-101.8 0L34.3 173.1c-28.1 28.1-28.1 73.7 0 101.8L173.1 413.7c28.1 28.1 73.7 28.1 101.8 0L413.7 274.9c28.1-28.1 28.1-73.7 0-101.8L274.9 34.3zM200 224a24 24 0 1 1 48 0 24 24 0 1 1 -48 0zM96 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 376a24 24 0 1 1 0-48 24 24 0 1 1 0 48zM352 200a24 24 0 1 1 0 48 24 24 0 1 1 0-48zM224 120a24 24 0 1 1 0-48 24 24 0 1 1 0 48zm96 328c0 35.3 28.7 64 64 64H576c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H461.7c11.6 36 3.1 77-25.4 105.5L320 413.8V448zM480 328a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/></svg>				<h2>Home Randomizer</h2>
 			</a>
-			<a href="\results" class="{{ $urlPath == '/results' ? 'pressed' : '' }}">
+			<a href="\results" class="{{ ( $urlPath == '/results' or $pageExists ) ? 'pressed' : '' }}">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M40 48C26.7 48 16 58.7 16 72v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V72c0-13.3-10.7-24-24-24H40zM192 64c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32H480c17.7 0 32-14.3 32-32s-14.3-32-32-32H192zM16 232v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V232c0-13.3-10.7-24-24-24H40c-13.3 0-24 10.7-24 24zM40 368c-13.3 0-24 10.7-24 24v48c0 13.3 10.7 24 24 24H88c13.3 0 24-10.7 24-24V392c0-13.3-10.7-24-24-24H40z"/></svg>
 				<h2>All Viewed Homes</h2>
 			</a>
@@ -37,7 +42,7 @@
 						}
 						?>
 						<li class="{{$home->type}}Color">
-							<a href="?home={{$key}}">{!! $prevHome !!}</a>
+							<a href="/results/{{$key}}">{!! $prevHome !!}</a>
 						</li>
 						<?php
 					}
@@ -58,7 +63,7 @@
 			</a>
 		</nav>
 		<nav id="tool-links" class="links-info">
-			<a href="\calculator" class="{{ $urlPath == '/calculator' ? 'pressed' : '' }}">
+			<a href="\calculator" class="{{ substr( $urlPath, 0, 11 ) == '/calculator' ? 'pressed' : '' }}">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V64c0-35.3-28.7-64-64-64H64zM96 64H288c17.7 0 32 14.3 32 32v32c0 17.7-14.3 32-32 32H96c-17.7 0-32-14.3-32-32V96c0-17.7 14.3-32 32-32zm32 160a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zM96 352a32 32 0 1 1 0-64 32 32 0 1 1 0 64zM64 416c0-17.7 14.3-32 32-32h96c17.7 0 32 14.3 32 32s-14.3 32-32 32H96c-17.7 0-32-14.3-32-32zM192 256a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm32 64a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zm64-64a32 32 0 1 1 0-64 32 32 0 1 1 0 64zm32 64a32 32 0 1 1 -64 0 32 32 0 1 1 64 0zM288 448a32 32 0 1 1 0-64 32 32 0 1 1 0 64z"/></svg>
 				<h2>Home Calculator</h2>
 			</a>

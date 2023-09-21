@@ -13,7 +13,7 @@
 			else
 			{
 				?>
-				<img id="preview-img" src="{{$results['imgSrc']}}" />
+				<img id="preview-img" src="{{$results['imgSrc']}}" draggable="false"/>
 				<br>
 				<div class="tabs-container">
 					<input
@@ -23,7 +23,9 @@
 						placeholder="Property Price?"
 						oninput="formatNumberInput(this)"
 					/>
+					<br>
 				</div>
+					<small style="color:red; text-align:center">Must be greater than 0 and less then 10,000,000</small>
 				<input type="hidden" value="{{$id}}" id="propertyId">
 				<table>
 					<tr>
@@ -49,7 +51,7 @@
 	</div>
 </div>
 <div class="timer-container">
-	<div class="timer" id="countdown">15</div>
+	<div class="timer" id="countdown">20</div>
 </div>
 
 <script>
@@ -69,4 +71,10 @@
 	}
 
 	var timerInterval = setInterval(updateCountdown, 1000);
+	var imgElement = document.getElementById("preview-img");
+
+    // Prevent right-click context menu on the image
+    imgElement.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+    });
 </script>

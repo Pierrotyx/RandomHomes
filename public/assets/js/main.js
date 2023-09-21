@@ -201,18 +201,22 @@ function newLevel()
 function checkResults( $timeout = false )
 {
 	$guessValue = $('#propertyPrice').val().replace(/,/g, '');
-	clearInterval(timerInterval);
 	if( $guessValue <= 0 && !$timeout )
 	{
-		alert( 'Please input a value greater then 0. ' );
 		return null;
 	}
-	else if( $guessValue >= 10000000 && !$timeout )
+	else if( $guessValue > 10000000 && !$timeout )
 	{
 		$('#propertyPrice').val( '10,000,000' );
-		alert( 'Please input a value less than 10,000,000. ' );
 		return null;
 	}
+	
+	if( $guessValue > 10000000 )
+	{
+		$guessValue = 10000000
+	}
+
+	clearInterval(timerInterval);
 
 	$("button").prop("disabled", true);
 	$("#overlay").show();

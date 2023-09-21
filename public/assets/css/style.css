@@ -643,8 +643,8 @@ a:hover
 
 .timer-container {
   	position: fixed;
-    bottom: 30px;
-    right: 30px;
+    bottom: 50px;
+    right: 50px;
     background-color: rgb(40,40,40,.7);
     color: #fff;
     padding: 10px 20px;
@@ -653,7 +653,7 @@ a:hover
 }
 
 .timer {
-    font-size: 200%;
+    font-size: 300%;
     font-weight: bold;
 }
 
@@ -704,6 +704,87 @@ a:hover
     flex: 1;
     text-align: center;
 }
+
+.resultLink
+{
+	display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calculatorFilters
+{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr); /* Four columns with equal width */
+	gap: 10px; /* Adjust the gap between the boxes as needed */
+	width: 100%;
+	margin: 0 auto;
+}
+
+#salaryLow, #hourlyLow
+{
+	color:red;
+}
+
+#salaryHigh, #hourlyHigh
+{
+	color:green;
+}
+
+#calcResult
+{
+	text-align: center;
+	margin-top: 20px;
+}
+
+.result-item {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Four columns with equal width */
+  margin: 10px 0;
+  text-align: center;
+}
+
+.result-item span {
+  font-weight: bold;
+  font-size: 125%;
+}
+
+.calcCost {
+	display:block;
+	text-align: center;
+	font-size: 190%;
+}
+
+.estimatedMonth
+{
+	border: 1px dotted black;
+	background-color: #c3b1e1;
+	border-radius: 2em;
+	padding-bottom: 10px;
+}
+
+.estimatedInfo
+{
+	border: 1px dotted black;
+	background-color: #c0c0c0;
+	border-radius: 2em;
+	padding-bottom: 10px;
+}
+
+.calculatorFilters input,
+.calculatorFilters select
+  {
+    width: 90%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+  }
+  input[type="checkbox"]
+  {
+    width: inherit;
+    margin-bottom: 0;
+  }
 
 /*===============================================================*/
 /* CSS with max-width of 768px
@@ -951,6 +1032,15 @@ a:hover
 }
 @media (max-width: 500px)
 {
+	.timer-container {
+		bottom: 30px;
+		right: 30px;
+		padding: 10px 20px;
+	}
+
+	.timer {
+		font-size: 200%;
+	}
 	.gameSubmit
 	{
 		width: 80%;
@@ -1008,6 +1098,19 @@ a:hover
 
 @media (max-width: 400px)
 {
+	.result-item span {
+	  font-size: 110%;
+	}
+
+	.calcCost {
+		display:block;
+		text-align: center;
+		font-size: 110%;
+	}
+	.calculatorFilters
+	{
+		width: 90%;
+	}
 	.links
 	{
 		width: 100%;

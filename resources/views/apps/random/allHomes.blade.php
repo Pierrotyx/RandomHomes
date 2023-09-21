@@ -3,7 +3,7 @@
 		<h2 class="title">All Viewed Homes</h2>
 		<div class="tabs-container">
 			<?php
-			$forRent = ( Session::get('type') ?? '' ) == 'ForRent';
+			$forRent = ( request()->type ?? '' ) == 'ForRent';
 			?>
 		  <div class="tab buying-tab {{ !( request()->type == 'ForRent' ) ? 'tab-clicked' : '' }}">For Sale</div>
 		  <div class="tab renting-tab {{ request()->type == 'ForRent' ? 'tab-clicked' : '' }}">For Rent</div>
@@ -31,7 +31,7 @@
 					$city = $address[count($address) - 2] . ', ' . explode( ' ', $address[count($address) - 1] )[1];
 					?>
 					<div class="list-element">
-						<a href="/results?home={{$home->id}}" class="result-link grid-link">
+						<a href="/results/{{$home->id}}?page={{request()->page ?? 1}}" class="result-link grid-link">
 							<img class="list-img" src="{{$home->imgSrc}}" alt="No Preview Image" />
 							{{$city}} |
 							{{!empty( $home->price ) ? ( '$' . number_format( $home->price ) ) : '--'}} |
@@ -75,7 +75,7 @@
 					$city = $address[count($address) - 2] . ', ' . explode( ' ', $address[count($address) - 1] )[1];
 					?>
 					<div class="list-element">
-						<a href="/results?home={{$home->id}}" class="result-link grid-link">
+						<a href="/results/{{$home->id}}?page={{request()->page ?? 1}}" class="result-link grid-link">
 							<img class="list-img" src="{{$home->imgSrc}}" alt="No Preview Image" />
 							{{$city}} |
 							<?php

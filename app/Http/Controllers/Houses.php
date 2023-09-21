@@ -19,13 +19,13 @@ class Houses extends Controller
             $homeId = $this->newSrc( $request->all() );
             $this->setSessions( $request->all() );
 
-            return !$homeId ? Redirect::to( '/?fail=1' ) : Redirect::to( '/results?home=' . $homeId );
+            return !$homeId ? Redirect::to( '/?fail=1' ) : Redirect::to( '/results/' . $homeId );
         }
         else
         {
             $states = $this->getStates();
             $parameters = [
-                'head' => 'templates.heads.home',
+                'head' => 'templates.heads.main',
                 'body' => 'apps.random.filters',
                 'parameters' => [ 'states' => $states ],
                 'startIcon' => 'home',
@@ -51,26 +51,35 @@ class Houses extends Controller
 
     public function result( Request $request )
     {
+        $path = explode( '/', $request->path() );
         if( !empty( $request->get('home') ) )
         {
-            $results = $this->getHome( $request->get('home') );
+            return Redirect::to( '/results/' . $request->get('home') );
+        }
+        elseif( is_numeric( end( $path ) ) )
+        {
+            $results = $this->getHome( end( $path ) );
             if( !empty( $results->lotId ) )
             {
-                $units = $this->getUnits( $request->get('home') );
+                $units = $this->getUnits( end( $path ) );
             }
 
             if( !empty( $results->url ) )
             {
+                $address = explode( ', ', $results->address );
+                $state = DB::table( 'states' )->where( 'stateCode', '=', substr( trim( end( $address ) ), 0, 2 ) )->first()->state;
                 return view(
                         'randomHouse',
                         [
                             'head' => 'templates.heads.home',
                             'body' => 'apps.random.results',
+                            'description' => 'descriptions.home',
                             'parameters' => ['results' => $results],
                             'startIcon' => 'home',
                             'results' => $results,
-                            'filters' => $this->getFilters( $request->get('home') ),
-                            'id' => $request->get('home'),
+                            'filters' => $this->getFilters( end( $path ) ),
+                            'id' => end( $path ),
+                            'state' => $state,
                             'units' => $units ?? false
                         ]
                 );
@@ -80,8 +89,9 @@ class Houses extends Controller
         return view(
                 'randomHouse',
                 [
-                    'head' => 'templates.heads.home',
+                    'head' => 'templates.heads.allHomes',
                     'body' => 'apps.random.allHomes',
+                    'description' => 'descriptions.allHomes',
                     'startIcon' => 'home',
                     'homeSales' => $this->getAllHomes('ForSale', $request->get('page') ?? 1 ),
                     'homeRents' => $this->getAllHomes('ForRent', $request->get('page') ?? 1 ),
@@ -104,12 +114,55 @@ class Houses extends Controller
         return view(
             'randomHouse',
             [
-                'head'      => 'templates.heads.home',
-                'body'      => 'apps.placethatprice.leaderboard',
-                'startIcon' => 'game',
-                'boardInfo' => $priceLeaderboard
+                'head'        => 'templates.heads.placeLeader',
+                'body'        => 'apps.placethatprice.leaderboard',
+                'description' => 'descriptions.placeLeader',
+                'startIcon'   => 'game',
+                'boardInfo'   => $priceLeaderboard
             ]
         );
+    }
+    
+    public function calculatorState( Request $request )
+    {
+        $states = DB::table( 'states' )->get();
+        $parameters = [ 'states' => $states, ];
+        if( $request->path() != 'calculator' )
+        {
+            $path = explode( '/', $request->path() );
+            $state = DB::table( 'states' )->where( 'state', '=', str_replace( '-', ' ', ucwords( end( $path ) ) ) )->first();
+            if( empty( $state ) )
+            {
+                return Redirect::to( '/calculator' );
+            }
+
+            $parameters['current'] = $state;
+        }
+
+        $homeId = $request->get( 'home' );
+        if( !empty( $homeId ) )
+        {
+            $home = DB::table( 'homes' )->where( 'id', '=', $homeId )->where( 'type', '=', 'ForSale' )->first();
+            if( !empty( $home ) )
+            {
+                $parameters['home'] = $home;
+            }
+            else
+            {
+                return Redirect::to( '/calculator' . ( !empty( $parameters['current'] ) ? ('/' . strtolower( $parameters['current']->state ) ) : '' ) );
+            }
+        }
+
+        return view(
+			'randomHouse',
+			[
+				'head' => 'templates.heads.calculator',
+				'body' => 'apps.calculator.main',
+                'description' => 'descriptions.calculator',
+				'startIcon' => 'tool',
+				'parameters' => $parameters
+			]
+		);
     }
 
     public function reroll( Request $request )
@@ -117,7 +170,8 @@ class Houses extends Controller
         $filters = Filters::getTranslatedFilters( $request->type );
         $homeId = $this->newSrc( $filters );
         //$this->setSessions( $filters );
-        return !$homeId ? Redirect::to( '/?fail=1' ) : Redirect::to( '/results?home=' . $homeId );
+        $page = !empty( $request->page ) ? '?page=' . $request->page : '';
+        return !$homeId ? Redirect::to( '/?fail=1' ) : Redirect::to( '/results/' . $homeId . $page );
     }
 
     private function getAllHomes( $type, $page )
@@ -133,6 +187,11 @@ class Houses extends Controller
         ;
         
         $count = $query->select(DB::raw('count(*) as total'))->first()->total;
+
+        if( $count <= ( $page - 1 ) * 50 )
+        {
+            $page = floor( $count / 50 ) + 1;
+        }
 
         $homes = $query
             ->select(
