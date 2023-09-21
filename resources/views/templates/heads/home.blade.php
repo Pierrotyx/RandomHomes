@@ -1,6 +1,6 @@
 <title>Random Homes | {{$results->address ?? 'RDiscovered Home'}}</title>
  <!-- Meta tags for SEO -->
-<meta name="description" content="Check out this amazing property! Price: {{$results->price ?? '--'}}, Beds: {{$results->bedrooms ?? '--'}}, Baths: {{$results->bathrooms ?? '--'}}, Living Size: {{$results->livingSize ?? '--'}}, Lot Size: {{$results->lotAreaSize ?? '--'">
+<meta name="description" content="Check out this amazing property! Price: {{$results->price ?? '--'}}, Beds: {{$results->bedrooms ?? '--'}}, Baths: {{$results->bathrooms ?? '--'}}, Living Size: {{$results->livingSize ?? '--'}}, Lot Size: {{$results->lotAreaSize ?? '--'}}">
 <meta name="keywords" content="random homes, searching for properties, houses for houses, us houses">
 <!-- Open Graph meta tags -->
 <meta property="og:title" content="{{$results->address ?? 'Random Home'}}">
