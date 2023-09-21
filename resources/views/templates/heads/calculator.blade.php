@@ -26,14 +26,9 @@
 <script type="application/ld+json">
 {
   "@context": "http://schema.org",
-  "@type": "WebSite",
+  "@type": "Website",
   "name": "Random Homes Mortgage Calculator",
   "description": "Experience seamless mortgage calculations with our automated Mortgage Calculator. It effortlessly inputs property details from your discovered homes, providing instant monthly payment estimates. Take the guesswork out of your home purchase planning!",
   "url": "{{ url()->current() }}"
-  "potentialAction": {
-	"@type": "Place",
-	"target": "{{ url()->current() }}?home={search_term_int}",
-	"query-input": "required name=search_term_int"
-  }
 }
 </script>
