@@ -20,6 +20,7 @@ $lotValues = [
 	2178000 => '50 acres',
 	4356000 => '100 acres'
 ];
+$forRent = ( Session::get('type') ?? '' ) == 'ForRent';
 ?>
 <div class="filter-box">
 	<form method="POST" action="">

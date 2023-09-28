@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Redirect;
 use App\Http\Controllers\Python;
 use App\Http\Controllers\Filters;
 use App\Models\Parameter;
+use Carbon\Carbon;
 
 class Houses extends Controller
 {
@@ -105,12 +106,6 @@ class Houses extends Controller
     
     public function priceLeaderboard()
     {
-        $priceLeaderboard = DB::table( 'leaderboard' )
-            ->limit( 500 )
-            ->orderByDesc( 'score' )
-            ->get()
-        ;
-
         return view(
             'randomHouse',
             [
@@ -118,9 +113,83 @@ class Houses extends Controller
                 'body'        => 'apps.placethatprice.leaderboard',
                 'description' => 'descriptions.placeLeader',
                 'startIcon'   => 'game',
-                'boardInfo'   => $priceLeaderboard
+                'boardInfo'   => $this->getLeaderboard( 'place5', '1 day' )
             ]
         );
+    }
+    
+    public function changeLeaderboard( Request $request )
+    {
+        $leaderboard = $this->getLeaderboard( $request->type, $request->interval );
+        $html = view('templates.leaderboard', ['boardInfo' => $leaderboard ] )->render();
+        return response()->json( ['html' => $html] );
+    }
+    
+    private function getLeaderboard( $type = 'place5', $interval = null, $order = 'desc' )
+    {
+        $query = DB::table( 'leaderboard' )
+            ->limit( 500 )
+            ->orderBy( 'score', $order )
+            ->where( 'type', '=', $type )
+        ;
+
+        if( !empty( $interval ) )
+        {
+            $query = $query->where( 'timestamp', '>=', date( 'Y-m-d H:i:s', strtotime( '-' . $interval ) ) );
+        }
+        
+        $priceLeaderboard = $query->get();
+        
+        foreach( $priceLeaderboard as &$row )
+        {
+            $now = Carbon::now();
+            $timestamp = Carbon::parse($row->timestamp);
+            $interval = Carbon::now()->diff($timestamp);
+            
+            $hours   = $interval->h + ($interval->days * 24);
+            $minutes = $interval->i;
+            $days    = $interval->days;
+            $months  = floor($days / 30);
+            $years   = floor($days / 365);
+
+            $seperator = '<br>';
+            if( $years >= 1 )
+            {
+                $firstTime = $years . ' Year' . ( $years != 1 ? 's' : '' );
+                $secondTime = $months % 12 . ' Month' . ( $months % 12 != 1 ? 's' : '' );
+            }
+            elseif( $months >= 1 )
+            {
+                $firstTime = $months . ' Month' . ( $months != 1 ? 's' : '' );
+                $secondTime = $days % 30 . ' Day' . ( $days % 30 != 1 ? 's' : '' );
+            }
+            elseif( $days >= 1 )
+            {
+                $firstTime = $days % 30 . ' Day' . ( $days != 1 ? 's' : '' );
+                $secondTime = $hours % 24 . ' Hour' . ( $hours % 24 != 1 ? 's' : '' );
+            }
+            elseif( $hours >= 1 )
+            {
+                $firstTime = $hours . ' Hour' . ( $hours != 1 ? 's' : '' );
+                $secondTime = $minutes % 60 . ' Minute' . ( $minutes % 60 != 1 ? 's' : '' );
+            }
+            else
+            {
+                $firstTime = $minutes . ' Minute' . ( $minutes % 60 != 1 ? 's' : '' );
+                $secondTime = '';
+            }
+
+            if( empty( $secondTime ) or substr( $secondTime, 0, 1 ) === '0' )
+            {
+                $secondTime = '';
+                $seperator = ' ';
+            }
+
+            $secondTime = substr( $secondTime, 0, 1 ) === '0' ? '' : $secondTime;
+            $row->timestamp = $firstTime . $seperator . $secondTime . ' ago';
+        }
+        
+        return $priceLeaderboard;
     }
     
     public function calculatorState( Request $request )
@@ -322,6 +391,7 @@ class Houses extends Controller
                 'guess'    => $request->propertyPrice,
                 'info'     => $info,
                 'round'    => $request->count,
+                'level'    => $request->level,
             ]
         )->render();
         return response()->json( ['html' => $html] );
@@ -345,24 +415,48 @@ class Houses extends Controller
     public function finalScore( Request $request )
     {
         Session::put( 'round', 0 );
+        $type = 'place' . $request->level;
         DB::table('leaderboard')->insert(
             [
                 'name' =>  'Anonymous',
                 'score' => ceil( Session::get( 'score' ) ),
-                'userId' => Session::get( 'userId' )
+                'userId' => Session::get( 'userId' ),
+                'type' => $type
             ]
         );
-        
-        $position = DB::table('leaderboard')
-            ->selectRaw('COUNT(*) + 1 as position')
-            ->where('score', '>', DB::table('leaderboard')->where( 'userId', Session::get( 'userId' ) )->value('score'))
-            ->first()
-        ;
 
-        // Reset the row number variable
-        DB::select( DB::raw( 'SET @row_number = 0' ) );
+        $datePeriods = [
+            'Day' => Carbon::now()->subDay(),
+            'Week' => Carbon::now()->subWeek(),
+            'Month' => Carbon::now()->subMonth(),
+            'Year' => Carbon::now()->subYear(),
+            'All Time' => Carbon::now()->subYears(1000)
+        ];
 
-        $html = view( 'apps.placethatprice.finalScore', [ 'rank' => $position->position ] )->render();
+        foreach( $datePeriods as $key => $date )
+        {
+            $interval = $date->format('Y-m-d H:i:s');
+
+            $score = DB::table('leaderboard')
+                ->selectRaw('COUNT(*) + 1 as position')
+                ->where(
+                    'score',
+                    '>',
+                    DB::table('leaderboard')
+                        ->where( 'userId', Session::get( 'userId' ) )
+                        ->value('score')
+                )
+                ->where( 'type', $type )
+                ->where( 'timestamp', '>=', $interval )
+                ->first()->position
+            ;
+            if( $score <= 500 )
+            {
+                $position[ $key ] = $score;
+            }
+        }
+
+        $html = view( 'apps.placethatprice.finalScore', [ 'ranks' => $position, 'level' => $request->level ] )->render();
         return response()->json( ['html' => $html] );
     }
     

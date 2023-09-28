@@ -12,7 +12,7 @@
 			</div>
 		</div>
 		<button id="game-button" onclick="newLevel()" class="submit-button">
-			<span>{{$round == 5 ? 'View Results!' : 'Next Level!'}}</span>
+			<span>{{$round == $level ? 'View Results!' : 'Next Level!'}}</span>
 		</button>
 	</div>
 </div>

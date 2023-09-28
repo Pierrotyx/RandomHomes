@@ -16,7 +16,9 @@
 				Embark on a journey of discovery and fun as you test your travel-price intuition. Let the adventure begin!
 			</p>
 		</div>
-		<button id="game-button" onclick="newLevel()" class="submit-button"><span>Play Now!</span></button>
+		<button id="game-button" onclick="levelCount = 3; newLevel()" class="submit-button"><span>Place 3 Homes!</span></button>
+		<button id="game-button" onclick="levelCount = 5; newLevel()" class="submit-button"><span>Place 5 Homes!</span></button>
+		<button id="game-button" onclick="levelCount = 10; newLevel()" class="submit-button"><span>Place 10 Homes!</span></button>
 		<a href="/placethatprice/leaderboard">
 			<button id="leaderboard-button" class="submit-button">
 				<span>Leaderboard</span>
