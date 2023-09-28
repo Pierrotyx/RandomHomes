@@ -27,6 +27,7 @@ Route::post( 'clicked-tab', [ Houses::class, 'clicked' ]);
 Route::post( 'get-cities', [ Houses::class, 'citiesOptions' ]);
 Route::post( '/end-screen', [ Houses::class, 'finalScore' ]);
 Route::post( '/change-name', [ Houses::class, 'changeName' ]);
+Route::post( '/get-leaderboard', [ Houses::class, 'changeLeaderboard' ]);
 
 $pages = [
 	'/',

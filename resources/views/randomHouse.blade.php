@@ -26,7 +26,7 @@
 		<meta name="csrf-token" content="{{ csrf_token() }}" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		
-		<link href="{{ asset( 'assets/css/style.css' ) }}" rel="stylesheet" />
+		<link href="{{ asset( 'assets/css/style.css' ) }}?time=2" rel="stylesheet" />
 		<link rel="canonical" href="{{ url()->current() }}">
 		@include( $head )
 	</head>
@@ -64,6 +64,8 @@
 		@include( 'templates.footer' )
 		<script type="text/javascript" src="{{asset('assets/js/main.js')}}"></script>
 		<script>
+			var interval = '1 day';
+			var leaderboardType = 'place5';
 			window.onload = function() {
 				// Check if some condition is met (e.g., a failed request)
 				var conditionFailed = true; // Replace this with your actual condition

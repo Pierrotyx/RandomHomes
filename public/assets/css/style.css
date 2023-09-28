@@ -207,29 +207,44 @@ select
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		width: 90%;
+		margin: 0 auto;
 	}
 
 .tab {
 	padding: 10px 30px;
 	background-color: #ccc;
-	color: #000;
-font-size: 125%;
+	font-size: 125%;
 	font-weight: bold;
 	transition: background-color 0.5s;
-width: 40%;
-text-align: center;
-border-top-left-radius: 2em;
+	text-align: center;
+	border-top-left-radius: 2em;
 	border-top-right-radius: 2em;
+	color: #fff;
+}
+
+.tab:first-child:nth-last-child(2),
+.tab:first-child:nth-last-child(2) ~ .tab
+{
+    width: 50%;
+}
+
+.tab:first-child:nth-last-child(3),
+.tab:first-child:nth-last-child(3) ~ .tab
+{
+    width: 30%;
 }
 
 .tab.buying-tab {
 	background-color: #A3000B; /* Change color for Buying tab */
-	color: #fff; /* Change text color for Buying tab */
 }
 
 .tab.renting-tab {
 	background-color: #7A48D6; /* Change color for Renting tab */
-	color: #fff; /* Change text color for Renting tab */
+}
+
+.tab.placeLeader {
+	background-color: #34db90; /* Change color for Renting tab */
 }
 
 .tab:not(:last-child)
@@ -672,8 +687,8 @@ a:hover
 }
 
 .leaderboard {
-    max-width: 400px;
-    margin: 20px auto;
+    width: 90%;
+    margin:  0 auto 20px auto;
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;
@@ -684,6 +699,7 @@ a:hover
     background-color: #34db90;
     color: #fff;
     font-weight: bold;
+	padding: 5px;
 }
 
 .leaderboard-row {
@@ -786,6 +802,18 @@ a:hover
     margin-bottom: 0;
   }
 
+.interval
+{
+	display: flex;
+	align-items: center;
+	flex-flow: row;
+	flex-direction: row;
+}
+.interval *
+{
+	flex: 1;
+	font-size: 110%;
+}
 /*===============================================================*/
 /* CSS with max-width of 768px
 /*===============================================================*/
@@ -835,6 +863,11 @@ a:hover
 /*===============================================================*/
 @media (max-width: 750px)
 {
+	.tabs-container
+	{
+		width: 100%;
+	}
+
 	.gameSubmit
 	{
 		width: 60%;
@@ -878,7 +911,8 @@ a:hover
 
 	body
 	{
-		padding:5px;
+		padding:0;
+		margin: 5px;
 	}
 	.links-info li a {
 		width: inherit;
@@ -1032,6 +1066,18 @@ a:hover
 }
 @media (max-width: 500px)
 {
+	.leaderboard
+	{
+		width: 100%;
+	}
+
+	.filter-wrapper {
+		background-color: inherit;
+		padding: 0;
+		border-radius: 0;
+		border: 0;
+	}
+
 	.timer-container {
 		bottom: 30px;
 		right: 30px;

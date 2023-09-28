@@ -70,7 +70,8 @@ $(window).resize(function() {
 	location.reload();
   }
 });
- $('.tab').click(function() {
+
+$('.tab').click(function() {
 	if ($(this).hasClass('tab-clicked')) {
 	  return false; // Prevent the click event
 	}
@@ -79,7 +80,56 @@ $(window).resize(function() {
 	$(this).addClass('tab-clicked'); // Add .clicked class to the clicked tab
 	
 	$('#sale-filters, #rent-filters, #submit-rent, #submit-sale').toggle();
-  });
+	if ($(this).hasClass('placeLeader')) {
+		leaderboardType = 'place' + $(this).html().substring(0, 1);
+		changeLeaderboard();
+	}
+});
+
+function changeInterval( e )
+{
+	i = $( e ).html();
+	interval = '';
+	if( i != 'All')
+	{
+		interval = '1 '+ i;
+	}
+
+	changeLeaderboard();
+	$('.interval button').prop('disabled', false);
+	$( e ).prop('disabled', true);
+}
+
+function changeLeaderboard()
+{
+	if( $("#overlay").is(":visible") )
+	{
+		return false;
+	}
+
+	$("#overlay").show();
+	$.ajax({
+		url: '/get-leaderboard',
+		type: 'POST',
+		dataType: 'json',
+		headers: {
+			'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
+		},
+		data: {
+			type: leaderboardType,
+			interval: interval
+		},
+		success: function(data) {
+			$('#board').html(data.html);
+			$("#overlay").hide();
+		},
+		error: function(xhr, status, error) {
+			alert('in here');
+			console.log('Error:', xhr.responseText);
+			$("#overlay").hide();
+		}
+	});
+}
 // Get all number input fields by class name
 const numberInputs = document.querySelectorAll('.number-input');
 
@@ -149,20 +199,23 @@ window.onbeforeunload = function() {
 var csrfToken = $('meta[name="csrf-token"]').attr('content');
 var gameCount = 1;
 var gameStarted = false;
+var levelCount = 0;
 function newLevel()
 {
 	gameStarted = true;
 	$("button").prop("disabled", true);
 	$("#overlay").show();
-	if( gameCount > 5 )
+	if( gameCount > levelCount )
 	{
-		gameStarted = false;
 		$.ajax({
 			url: '/end-screen',
 			type: 'POST',
 			dataType: 'json',
 			headers: {
 				'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
+			},
+			data: {
+				level: levelCount
 			},
 			success: function(data) {
 				$('.screen-wrap').html(data.html);
@@ -230,7 +283,8 @@ function checkResults( $timeout = false )
 		data: {
 			propertyPrice: Number( $guessValue ),
 			id: $('#propertyId').val(),
-			count: gameCount
+			count: gameCount,
+			level: levelCount
 		},
 		success: function(data) {
 			gameCount++;
@@ -274,6 +328,7 @@ function changeName()
 		success: function(data) {
 			if( data == 'true')
 			{
+				gameStarted = false;
 				alert('Your name has been added!!');
 			}
 			else
