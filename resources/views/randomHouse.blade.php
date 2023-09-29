@@ -26,7 +26,7 @@
 		<meta name="csrf-token" content="{{ csrf_token() }}" />
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		
-		<link href="{{ asset( 'assets/css/style.css' ) }}?time=4" rel="stylesheet" />
+		<link href="{{ asset( 'assets/css/style.css' ) }}?time=5" rel="stylesheet" />
 		<link rel="canonical" href="{{ url()->current() }}">
 		@include( $head )
 	</head>
@@ -62,7 +62,7 @@
 		}
 		?>
 		@include( 'templates.footer' )
-		<script type="text/javascript" src="{{asset('assets/js/main.js')}}?time=4"></script>
+		<script type="text/javascript" src="{{asset('assets/js/main.js')}}?time=5"></script>
 		<script>
 			var interval = '1 day';
 			var leaderboardType = 'place5';
