@@ -814,6 +814,16 @@ a:hover
 	flex: 1;
 	font-size: 110%;
 }
+
+.kofiTop
+{
+	margin-left: auto;
+}
+.kofiSide
+{
+	margin: auto 10px;
+	display: none;
+}
 /*===============================================================*/
 /* CSS with max-width of 768px
 /*===============================================================*/
@@ -863,6 +873,15 @@ a:hover
 /*===============================================================*/
 @media (max-width: 750px)
 {
+	.kofiTop
+	{
+		display: none;
+	}
+
+	.kofiSide
+	{
+		display: block;
+	}
 	.tabs-container
 	{
 		width: 100%;
