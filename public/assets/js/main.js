@@ -81,7 +81,7 @@ $('.tab').click(function() {
 	
 	$('#sale-filters, #rent-filters, #submit-rent, #submit-sale').toggle();
 	if ($(this).hasClass('placeLeader')) {
-		leaderboardType = 'place' + $(this).html().substring(0, 1);
+		leaderboardType = 'place' + $(this).html().substring(0, 2).trim();
 		changeLeaderboard();
 	}
 });
