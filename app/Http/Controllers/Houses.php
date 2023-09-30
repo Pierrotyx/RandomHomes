@@ -320,11 +320,13 @@ class Houses extends Controller
         array_push( $gameProperties, $results['id'] );
         Session::put( 'gameProperties', $gameProperties );
 
-        $state = substr( explode( ', ', $results['address'] )[2], 0, 2 );
+        $addressArray = explode( ', ', $results['address'] );
+        $results['city'] = $addressArray[1];
+        $state = substr( $addressArray[2], 0, 2 );
         $results['state'] = DB::table( 'states' )
             ->select( 'state' )
             ->where( 'stateCode', '=', strtoupper( $state ) )
-            ->first()
+            ->first()->state
         ;
         $html = view('apps.placethatprice.newHome', ['results' => $results, 'id' => $randomId, 'round' => $request->count ] )->render();
         return response()->json( ['html' => $html] );

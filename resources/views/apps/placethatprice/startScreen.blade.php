@@ -15,6 +15,7 @@
 				<br><br>
 				Embark on a journey of discovery and fun as you test your travel-price intuition. Let the adventure begin!
 			</p>
+			<h3 style="color:purple"><a href="https://www.reddit.com/r/RandomHomes/">Click here to join our reddit page to give your thoughts and opinions!</a></h3>
 		</div>
 		<button id="game-button" onclick="levelCount = 3; newLevel()" class="submit-button"><span>Place 3 Homes!</span></button>
 		<button id="game-button" onclick="levelCount = 5; newLevel()" class="submit-button"><span>Place 5 Homes!</span></button>

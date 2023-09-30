@@ -29,7 +29,13 @@
 				<input type="hidden" value="{{$id}}" id="propertyId">
 				<table>
 					<tr>
-						<td><b>State:</b><br>{{ !empty( $results['state'] ) ? $results['state']->state: 'Unknown' }} </td>
+						<td>
+							<b>Location:</b>
+							<br>
+							{{ !empty( $results['city'] ) ? $results['city']: 'Unknown' }},
+							<br>
+							{{ !empty( $results['state'] ) ? $results['state']: 'Unknown' }}
+						</td>
 						<td><b>Property Type:</b><br>{{!empty( $results['propertyType'] ) ? $results['propertyType'] : '--'}}</td>
 					</tr>
 					<tr>
@@ -51,12 +57,13 @@
 	</div>
 </div>
 <div class="timer-container">
-	<div class="timer" id="countdown">20</div>
+	<div class="timer" id="countdown">25</div>
 </div>
 
 <script>
 	var countdownElement = document.getElementById('countdown');
-	var countdown = 20;
+	var countdown = 25;
+	var clickOff = false;
 
 	function updateCountdown() {
 			countdown--;
@@ -75,6 +82,16 @@
 
     // Prevent right-click context menu on the image
     imgElement.addEventListener("contextmenu", function (e) {
-      e.preventDefault();
-    });
+		e.preventDefault();
+	});
+
+	window.addEventListener('blur', function ()
+	{
+		if( !clickOff )
+		{
+			countdown = 1;
+			clickOff = true;
+			alert('If you were cheating, stop! If you clicked the wrong button, I\'m Sorry.');
+		}
+	});
 </script>
