@@ -67,7 +67,10 @@ $(window).resize(function() {
  {
   if( event.persisted )
   {
-	location.reload();
+	const currentUrl = window.location.pathname;
+	if (currentUrl === '/' || /^\/results\/\d+$/.test(currentUrl)) {
+		location.reload();
+	}
   }
 });
 
