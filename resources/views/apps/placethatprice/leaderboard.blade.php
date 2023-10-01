@@ -6,9 +6,10 @@
 			</button>
 		</a>
 		<div class="tabs-container">
-		  <div class="tab placeLeader">3 <br>Homes</div>
-		  <div class="tab placeLeader tab-clicked">5 <br>Homes</div>
-		  <div class="tab placeLeader">10 <br>Homes</div>
+		  <div class="tab placeLeader">3<br>Homes</div>
+		  <div class="tab placeLeader tab-clicked">5<br>Homes</div>
+		  <div class="tab placeLeader">10<br>Homes</div>
+		  <div class="tab placeLeader">100<br>Homes</div>
 		</div>
 		<div class="leaderboard">
 			<div class="leaderboard-header">

@@ -22,6 +22,7 @@
 						class="number-input"
 						placeholder="Property Price?"
 						oninput="formatNumberInput(this)"
+						onkeypress="handleKeyPress(event)"
 					/>
 					<br>
 				</div>
@@ -84,6 +85,12 @@
     imgElement.addEventListener("contextmenu", function (e) {
 		e.preventDefault();
 	});
+
+	function handleKeyPress(event) {
+		if (event.key === "Enter") {
+			checkResults();
+		}
+	}
 
 	/*
 	window.addEventListener('blur', function ()

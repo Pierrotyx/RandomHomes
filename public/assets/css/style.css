@@ -235,6 +235,12 @@ select
     width: 30%;
 }
 
+.tab:first-child:nth-last-child(4),
+.tab:first-child:nth-last-child(4) ~ .tab
+{
+    width: 20%;
+}
+
 .tab.buying-tab {
 	background-color: #A3000B; /* Change color for Buying tab */
 }
@@ -829,6 +835,11 @@ a:hover
 /*===============================================================*/
 @media (max-width: 1000px) and (min-width: 751px)
 {
+	.leaderboard
+	{
+		width: 100%;
+	}
+
 	body
 	{
 		padding: 0 10px 10px 10px;
@@ -873,6 +884,15 @@ a:hover
 /*===============================================================*/
 @media (max-width: 750px)
 {
+	.leaderboard
+	{
+		width: 100%;
+	}
+
+	.tab.placeLeader {
+		font-size: 90%;
+	}
+
 	.kofiTop
 	{
 		display: none;
@@ -1085,11 +1105,6 @@ a:hover
 }
 @media (max-width: 500px)
 {
-	.leaderboard
-	{
-		width: 100%;
-	}
-
 	.filter-wrapper {
 		background-color: inherit;
 		padding: 0;
