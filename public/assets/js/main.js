@@ -84,7 +84,8 @@ $('.tab').click(function() {
 	
 	$('#sale-filters, #rent-filters, #submit-rent, #submit-sale').toggle();
 	if ($(this).hasClass('placeLeader')) {
-		leaderboardType = 'place' + $(this).html().substring(0, 2).trim();
+		var indexOfBr = $(this).html().indexOf('<br>');
+		leaderboardType = 'place' + $(this).html().substring(0, indexOfBr).trim();
 		changeLeaderboard();
 	}
 });
@@ -240,7 +241,8 @@ function newLevel()
 				'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
 			},
 			data: {
-				count: gameCount
+				count: gameCount,
+				level: levelCount
 			},
 			success: function(data) {
 				$('.screen-wrap').html(data.html);

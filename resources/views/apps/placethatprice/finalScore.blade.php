@@ -10,7 +10,7 @@
 				echo 'Congrats!!!';
 				foreach( $ranks as $key => $rank )
 				{
-					echo '<br>You are ranked #' . $rank . ' in a ' . $key . '!';
+					echo '<br>Ranked #' . $rank . ' in a ' . $key . '!';
 				}
 			}
 			?>
