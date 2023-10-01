@@ -85,6 +85,7 @@
 		e.preventDefault();
 	});
 
+	/*
 	window.addEventListener('blur', function ()
 	{
 		if( !clickOff )
@@ -94,4 +95,5 @@
 			alert('If you were cheating, stop! If you clicked the wrong button, I\'m Sorry.');
 		}
 	});
+	*/
 </script>
