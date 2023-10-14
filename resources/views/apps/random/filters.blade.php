@@ -23,18 +23,16 @@ $lotValues = [
 $forRent = ( Session::get('type') ?? '' ) == 'ForRent';
 ?>
 <div class="filter-box">
-	<form method="POST" action="">
+	<form method="POST" action="" id="filters">
 		@csrf <!-- {{ csrf_field() }} -->
 		<div class="filter-wrapper">
 			<div class="tabs-container">
-				<?php
-				$forRent = ( Session::get('type') ?? '' ) == 'ForRent';
-				?>
 			  <div class="tab buying-tab {{ !$forRent ? 'tab-clicked' : '' }}">For Sale</div>
 			  <div class="tab renting-tab {{ $forRent ? 'tab-clicked' : '' }}">For Rent</div>
 			</div>
 			<hr style="margin: 0" />
 			<input type="hidden" name="type" id="type" value="" />
+			<button type="button" id="resetButton" onclick="clearFilters()">Reset Filters</button>
 			<div id="sale-filters">
 				<div class="filter-body">
 					<div class="filter-row">
@@ -93,7 +91,7 @@ $forRent = ( Session::get('type') ?? '' ) == 'ForRent';
 									else
 									{
 										?>
-										<option value="">Select State</option>
+										<option value="">Select a City...</option>
 										<?php
 										
 									}
@@ -338,7 +336,7 @@ $forRent = ( Session::get('type') ?? '' ) == 'ForRent';
 									else
 									{
 										?>
-										<option value="">Select State</option>
+										<option value="">Select a City...</option>
 										<?php
 										
 									}
@@ -526,3 +524,15 @@ $forRent = ( Session::get('type') ?? '' ) == 'ForRent';
 		<button type="submit" value="ForRent" id="submit-rent" onclick="newSrc(this.value)" class="submit-button"><span>Find a Rental</span></button>
 	</form>
 </div>
+
+<script>
+	function clearFilters()
+	{
+		if (confirm("Are you sure you want to reset the filters?"))
+		{
+			$("#filters input:not([name='_token']), #filters select").val("");
+			$("#filters input[type='checkbox']").prop("checked", false);
+		}
+
+	}
+</script>

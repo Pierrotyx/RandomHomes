@@ -11,8 +11,17 @@
 				<h1><a href="{{$info['url']}}" target="_blank">Click Here to view {{ $info['address'] }}</a></h1>
 			</div>
 		</div>
-		<button id="game-button" onclick="newLevel()" class="submit-button">
+		<button id="game-button" onclick="newLevel( '{{ $homeUrl }}' )" class="submit-button">
 			<span>{{$round == $level ? 'View Results!' : 'Next Level!'}}</span>
 		</button>
 	</div>
 </div>
+<?php
+if( !empty( $gameOff ) )
+{
+	?>
+	<script>
+		gameStarted = false;
+	</script>
+	<?php
+}

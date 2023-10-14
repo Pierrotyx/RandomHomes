@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class CleanupGameTempTable extends Command
 {

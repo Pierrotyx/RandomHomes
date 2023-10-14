@@ -10,6 +10,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         // ...
         \App\Console\Commands\CleanupGameTempTable::class,
+        \App\Console\Commands\dailyPlace::class,
     ];
     /**
      * Define the application's command schedule.
@@ -19,6 +20,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('dailyPlace')->timezone('America/Los_Angeles')->dailyAt('00:00');
         $schedule->command('cleanup:gameTemp')->everyMinute();
     }
 
