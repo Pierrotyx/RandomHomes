@@ -5,6 +5,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Users;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\Houses;
+use App\Http\Controllers\Games;
+use App\Http\Controllers\Tools;
 use Illuminate\Support\Facades\DB;
 
 /*
@@ -20,21 +22,24 @@ use Illuminate\Support\Facades\DB;
 
 Route::post( '/', [ Houses::class, 'index' ]);
 Route::post( 'results', [ Houses::class, 'index' ]);
-Route::post( 'new-home', [ Houses::class, 'newGame' ]);
-Route::post( 'check-result', [ Houses::class, 'checkResult' ]);
 Route::post( 'reroll', [ Houses::class, 'reroll' ]);
 Route::post( 'clicked-tab', [ Houses::class, 'clicked' ]);
 Route::post( 'get-cities', [ Houses::class, 'citiesOptions' ]);
-Route::post( '/end-screen', [ Houses::class, 'finalScore' ]);
-Route::post( '/change-name', [ Houses::class, 'changeName' ]);
-Route::post( '/get-leaderboard', [ Houses::class, 'changeLeaderboard' ]);
+
+Route::post( 'new-home', [ Games::class, 'newGame' ]);
+Route::post( 'check-result', [ Games::class, 'checkResult' ]);
+Route::post( '/end-screen', [ Games::class, 'finalScore' ]);
+Route::post( '/change-name', [ Games::class, 'changeName' ]);
+Route::post( '/get-leaderboard', [ Games::class, 'changeLeaderboard' ]);
+
+Route::post( '/get-daily', [ Games::class, 'getDaily' ]);
+Route::post( '/check-daily', [ Games::class, 'checkDaily' ]);
 
 $pages = [
 	'/',
 	'cuddleBunny',
 	'results',
 	'placethatprice',
-	'placethatprice/leaderboard',
 	'calculator',
 	'about-us',
 	'privacy',
@@ -46,6 +51,7 @@ if(
 	and !in_array( strtolower( request()->path() ), $pages )
 	and strpos(request()->path(), 'calculator') !== 0
 	and strpos(request()->path(), 'results') !== 0
+	and strpos(request()->path(), 'placethatprice') !== 0
 )
 {
 	redirect()->to('/')->send();
@@ -65,8 +71,34 @@ Route::get('placethatprice', function () {
 	);
 });
 
-Route::get('placethatprice/leaderboard', [ Houses::class, 'priceLeaderboard' ]);
-Route::get( 'calculator{any}', [ Houses::class, 'calculatorState' ])->where('any', '.*');
+Route::get('placethatprice/daily', [ Games::class, 'dailyStart' ] );
+
+Route::get('placethatprice/competitive', function () {
+    return view(
+		'randomHouse',
+		[
+			'head' => 'templates.heads.place',
+			'body' => 'apps.placethatprice.competitive',
+			'description' => 'descriptions.place',
+			'startIcon' => 'game',
+		]
+	);
+});
+
+Route::get('placethatprice/custom', function () {
+    return view(
+		'randomHouse',
+		[
+			'head' => 'templates.heads.place',
+			'body' => 'apps.placethatprice.startScreen',
+			'description' => 'descriptions.place',
+			'startIcon' => 'game',
+		]
+	);
+});
+
+Route::get('placethatprice/leaderboard', [ Games::class, 'priceLeaderboard' ]);
+Route::get( 'calculator{any}', [ Tools::class, 'calculatorState' ])->where('any', '.*');
 
 Route::get('privacy', function () {
     return view(

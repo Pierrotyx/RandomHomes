@@ -65,6 +65,7 @@
 	var countdownElement = document.getElementById('countdown');
 	var countdown = 25;
 	var clickOff = false;
+	var checkUrl = '{{$url}}';
 
 	function updateCountdown() {
 			countdown--;

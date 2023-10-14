@@ -88,6 +88,12 @@ $('.tab').click(function() {
 		leaderboardType = 'place' + $(this).html().substring(0, indexOfBr).trim();
 		changeLeaderboard();
 	}
+	
+	if ($(this).hasClass('placeDaily')) {
+		var indexOfBr = $(this).html().indexOf('<br>');
+		levelCount = $(this).html().substring(0, indexOfBr).trim();
+		renderCalendar();
+	}
 });
 
 function changeInterval( e )
@@ -128,7 +134,6 @@ function changeLeaderboard()
 			$("#overlay").hide();
 		},
 		error: function(xhr, status, error) {
-			alert('in here');
 			console.log('Error:', xhr.responseText);
 			$("#overlay").hide();
 		}
@@ -203,57 +208,32 @@ window.onbeforeunload = function() {
 var csrfToken = $('meta[name="csrf-token"]').attr('content');
 var gameCount = 1;
 var gameStarted = false;
-var levelCount = 0;
-function newLevel()
+function newLevel( homeUrl )
 {
 	gameStarted = true;
 	$("button").prop("disabled", true);
 	$("#overlay").show();
-	if( gameCount > levelCount )
-	{
-		$.ajax({
-			url: '/end-screen',
-			type: 'POST',
-			dataType: 'json',
-			headers: {
-				'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
-			},
-			data: {
-				level: levelCount
-			},
-			success: function(data) {
-				$('.screen-wrap').html(data.html);
-				$("button").prop("disabled", false);
-				$("#overlay").hide();
-			},
-			error: function(xhr, status, error) {
-				console.log('Error:', xhr.responseText);
-			}
-		});
-	}
-	else
-	{
-		$.ajax({
-			url: '/new-home',
-			type: 'POST',
-			dataType: 'json',
-			headers: {
-				'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
-			},
-			data: {
-				count: gameCount,
-				level: levelCount
-			},
-			success: function(data) {
-				$('.screen-wrap').html(data.html);
-				$("button").prop("disabled", false);
-				$("#overlay").hide();
-			},
-			error: function(xhr, status, error) {
-				console.log('Error:', xhr.responseText);
-			}
-		});
-	}
+	$.ajax({
+		url: homeUrl,
+		type: 'POST',
+		dataType: 'json',
+		headers: {
+			'X-CSRF-TOKEN': csrfToken // Include the CSRF token in the request headers
+		},
+		data: {
+			count: gameCount,
+			level: levelCount,
+			day: homeDay
+		},
+		success: function(data) {
+			$('.screen-wrap').html(data.html);
+			$("button").prop("disabled", false);
+			$("#overlay").hide();
+		},
+		error: function(xhr, status, error) {
+			console.log('Error:', xhr.responseText);
+		}
+	});
 }
 
 function checkResults( $timeout = false )
@@ -279,7 +259,7 @@ function checkResults( $timeout = false )
 	$("button").prop("disabled", true);
 	$("#overlay").show();
 	$.ajax({
-		url: '/check-result',
+		url: checkUrl,
 		type: 'POST',
 		dataType: 'json',
 		headers: {

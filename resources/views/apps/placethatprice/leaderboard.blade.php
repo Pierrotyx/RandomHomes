@@ -1,6 +1,6 @@
 <div class="info-box compress">
 	<div class="filter-wrapper" style="height:inherit;">
-		<a href="/placethatprice">
+		<a href="/placethatprice/competitive">
 			<button id="game-button" class="submit-button">
 				<span>Play Now!</span>
 			</button>
@@ -35,7 +35,7 @@
 				@include( 'templates.leaderboard', [ 'boardInfo' => $boardInfo ] )
 			</div>
 		</div>
-		<a href="/placethatprice">
+		<a href="/placethatprice/competitive">
 			<button id="game-button" class="submit-button">
 				<span>Play Now!</span>
 			</button>
